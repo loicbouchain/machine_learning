@@ -10,6 +10,7 @@ DISTANCE_SHOOT_FITNESS =30
 
 DISTANCE_SHOOT_CONDITION=300
 FITNESS_SCORE_CONDITION=16000
+arrayDistance=[]
 class Scorpion:
 
     def __init__(self):
@@ -88,12 +89,8 @@ def generate_first_population(): #génére la 1er génération de scorpion avec 
     return listAllPop
 
 def evaluation(population): #évalue les scoprions pour établir une hiérarchie 
-    """ 
-    for i in range(int(len(population)),NUMBER_OF_SCORPION):
-        scoprion = Scorpion()
-        population.append(scoprion)"""
     for pop in population:
-        pop.fitness = 20
+        pop.fitness = 0
         longueurVide = longueurAVide(pop.lb,pop.lc)
         longeurDep = longueurDeplacement(pop.lf,pop.lc)
         K = ressortK(pop.youngmodule,pop.coeffpoisson)
@@ -106,14 +103,14 @@ def evaluation(population): #évalue les scoprions pour établir une hiérarchie
         if is_rupture(longeurDep,pop.b,pop.h,K,pop.lb,pop.youngmodule)==True:
             
             pop.isRupture = True
-            pop.fitness = pop.fitness*0.02
+            pop.fitness = pop.fitness-5000
         else : 
             pop.fitness = pop.fitness+5000
             pop.isRupture = False
             
         
         if is_tire(longueurVide,pop.lf,pop.lc,pop.lb)==False: #si le tire est possible
-            pop.fitness = pop.fitness*0.02
+            pop.fitness = pop.fitness-5000
             pop.isTire = False
         else : 
             pop.isTire = True
@@ -134,7 +131,7 @@ def tournament_selection(listAllPop): #permet de choisir les meilleurs ensemble
         popsSelected.insert(i,[pops[i],pops[i+1]])
     return popsSelected
 
-def test(index,scorpionChild1,scorpionChild2): #échnage une des 12 propriétés
+def exchangeProp(index,scorpionChild1,scorpionChild2): #échange une des 12 propriétés
     if index == 1:
         tmp = scorpionChild1.lb
         scorpionChild1.lb = scorpionChild2.lb
@@ -220,7 +217,7 @@ def enjambement(pops): #échnage de propriétés entre les couples
             if randomProperty in indexChange:
                 while randomProperty in indexChange:
                     randomProperty=rand.randrange(1, 12)
-            test(randomProperty,pop[0],pop[1])
+            exchangeProp(randomProperty,pop[0],pop[1])
             indexChange.append(randomProperty)
         popFilles.insert(0,pop[0])
         popFilles.insert(0,pop[1])
@@ -239,7 +236,7 @@ def mutation(pops):
 def condition(pops):
     res = False
     pops.sort(key=lambda x: x.fitness,reverse=True)
-    if pops[0].d > DISTANCE_SHOOT_CONDITION and pops[0].fitness > FITNESS_SCORE_CONDITION and pops[0].isTire == True and pops[0].isRupture == False: # sile meileur scorpion a ces valeurs
+    if pops[0].d > DISTANCE_SHOOT_CONDITION and pops[0].fitness > FITNESS_SCORE_CONDITION and pops[0].isTire == True and pops[0].isRupture == False: # si le meileur scorpion a ces valeurs
         res = True
     return res
 
@@ -254,22 +251,18 @@ def get_new_pop(listAllPop):
 graphDistance = matplotlib.pyplot 
 listAllPop=generate_first_population()#génération de la 1er génération
 
-arrayFitness=[]
-while condition(listAllPop) == False: # tant que les conditions ne sont pas réunis
 
+while condition(listAllPop) == False: # tant que les conditions ne sont pas réunis
     arrayEval = evaluation(listAllPop) #évalue les scorpions
     arrayTournament = tournament_selection(arrayEval)# défini les couples
     listAllPop = enjambement(arrayTournament) #modification des propriétées entre les couples
     evaluation(listAllPop)# évaluation
     mutation(listAllPop)#mutaion 1% de chance de changer une propriétée au hasard
     listAllpop = get_new_pop(listAllPop)# ajout d'un nouvelle échantillon de scorpion
-    
-    arrayDistance=[]
-
-    listAllPop.sort(key=lambda x: x.d,reverse=True)
-    arrayFitness.append(listAllPop[0].d)
-#graphDistance.plot(arrayFitness)
-#graphDistance.ylabel('Distance en mètre')
-#graphDistance.show()
+    listAllPop.sort(key=lambda x: x.fitness,reverse=True) #Met en premier dans la liste, les scorpions ayant le plus de Fitness
+    arrayDistance.append(listAllPop[0].d) #ajoute la distance de tir du scorpion a la liste
+graphDistance.plot(arrayDistance)
+graphDistance.ylabel('Distance en mètre')
+graphDistance.show()#montre le graphique de l'évolution de la distance du tir des scorpions en fonction de chaque génération
 print(str(listAllPop[0].d)+" "+str(listAllPop[0].fitness))
 
