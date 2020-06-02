@@ -48,7 +48,6 @@ def masseProjectile(p,b,h,lf):
     return p*b*h*lf
 
 def velocite(ressortK,longueurDeplacement,masseProjectile):
-    #print(masseProjectile)
     return sqrt((ressortK*(longueurDeplacement**2))/(masseProjectile))
 
 def portee(velocite,pesanteur,a):
@@ -72,7 +71,6 @@ def is_rupture(longueurDeplacement,b,h,ressortK,lb,youngmodule):
 
 def is_tire(longueurAVide,longueurFleche,longueurCorde,longueurArc): #retourne vrai si le scorpion peut tirer
     res = True
-    #print(str(longueurAVide)+"  "+str(longueurFleche)+"  "+str(longueurCorde)+"   "+str(longueurArc))
     if longueurAVide>longueurFleche:
         res=False
     
@@ -264,5 +262,9 @@ while condition(listAllPop) == False: # tant que les conditions ne sont pas réu
 graphDistance.plot(arrayDistance)
 graphDistance.ylabel('Distance en mètre')
 graphDistance.show()#montre le graphique de l'évolution de la distance du tir des scorpions en fonction de chaque génération
-print(str(listAllPop[0].d)+" "+str(listAllPop[0].fitness))
+print("Distance du scorpion avec le meilleur score de fitness : "+str(listAllPop[0].d) + " mètres")
+print("Score de fitness : "+str(listAllPop[0].fitness))
+print("Hauteur section bras : "+str(listAllPop[0].h))
+print("Longueur du bras : "+str(listAllPop[0].lb))
+print("Longueur corde : "+str(listAllPop[0].lc))
 
